@@ -1,5 +1,6 @@
 # serv00-nezha-auto
 ## 调度：这个workflow设置为每1小时运行一次，并且可以手动触发。
+    - 对了，如果你不知道你的pm2地址在哪可以手动输入'which pm2'来查看你的pm2路径
 ## 步骤：
 Checkout code：检查出代码，虽然这里不需要代码，但是是GitHub Actions的惯例步骤。
 Install sshpass：安装 sshpass 工具，用于非交互式SSH登录。
