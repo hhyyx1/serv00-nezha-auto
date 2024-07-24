@@ -46,8 +46,8 @@ except json.JSONDecodeError:
 # 初始化汇总消息
 summary_message = "哪吒面板恢复操作结果：\n"
 
-# 默认恢复命令
-default_restore_command = "cd ~/nezhapanel && pm2 start ./dashboard"
+# 默认恢复命令（假设 pm2 的路径为 /usr/local/bin/pm2）
+default_restore_command = "/pm2 start ./dashboard"
 
 # 遍历服务器列表并执行恢复操作
 for server in servers:
