@@ -67,10 +67,11 @@ for server in servers:
         if not pm2_path:
             raise Exception("无法找到 pm2 路径")
         restore_command = f"sshpass -p '{password}' ssh -o StrictHostKeyChecking=no -p {port} {username}@{host} 'cd ~/nezhapanel && {pm2_path} start ./dashboard'"
+        print(f"Executing restore command on {host}: {restore_command}")
         output = subprocess.check_output(restore_command, shell=True, stderr=subprocess.STDOUT)
         summary_message += f"\n成功恢复 {host} 上的哪吒面板服务：\n{output.decode('utf-8')}"
     except subprocess.CalledProcessError as e:
-        summary_message += f"\n无法恢复 {host} 上的哪吒面板服务：\n{e.output.decode('utf-8')}"
+        summary_message += f"\n无法恢复 {host} 上的哪吒面板服务：\n{e.output.decode('utf-8')}\nCommand: {restore_command}\nError: {str(e)}"
     except Exception as e:
         summary_message += f"\n在 {host} 上查找 pm2 失败：\n{str(e)}"
 
