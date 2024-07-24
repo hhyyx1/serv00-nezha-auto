@@ -46,8 +46,8 @@ except json.JSONDecodeError:
 # 初始化汇总消息
 summary_message = "哪吒面板恢复操作结果：\n"
 
-# 默认恢复命令（假设 pm2 的路径为 /usr/local/bin/pm2）
-default_restore_command = "/file_manager/.pm2 start ./dashboard"
+# 默认恢复命令
+default_restore_command = "cd ~/nezhapanel && pm2 start ./dashboard"
 
 # 遍历服务器列表并执行恢复操作
 for server in servers:
@@ -59,13 +59,20 @@ for server in servers:
 
     print(f"连接到 {host}...")
 
-    # 执行恢复命令（这里假设使用 SSH 连接和密码认证）
-    restore_command = f"sshpass -p '{password}' ssh -o StrictHostKeyChecking=no -p {port} {username}@{host} '{cron_command}'"
+    # 查找 pm2 路径并执行恢复命令
+    find_pm2_command = "which pm2"
+    find_pm2_full_command = f"sshpass -p '{password}' ssh -o StrictHostKeyChecking=no -p {port} {username}@{host} '{find_pm2_command}'"
     try:
+        pm2_path = subprocess.check_output(find_pm2_full_command, shell=True, stderr=subprocess.STDOUT).decode('utf-8').strip()
+        if not pm2_path:
+            raise Exception("无法找到 pm2 路径")
+        restore_command = f"sshpass -p '{password}' ssh -o StrictHostKeyChecking=no -p {port} {username}@{host} 'cd ~/nezhapanel && {pm2_path} start ./dashboard'"
         output = subprocess.check_output(restore_command, shell=True, stderr=subprocess.STDOUT)
         summary_message += f"\n成功恢复 {host} 上的哪吒面板服务：\n{output.decode('utf-8')}"
     except subprocess.CalledProcessError as e:
         summary_message += f"\n无法恢复 {host} 上的哪吒面板服务：\n{e.output.decode('utf-8')}"
+    except Exception as e:
+        summary_message += f"\n在 {host} 上查找 pm2 失败：\n{str(e)}"
 
 # 发送汇总消息到 Telegram
 send_telegram_message(telegram_token, telegram_chat_id, summary_message)
